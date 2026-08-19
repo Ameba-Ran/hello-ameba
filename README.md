@@ -20,7 +20,7 @@ ASR, TTS, embeddings, RAG, Dockerfile).
 cp .env.example .env                       # fill in AMEBA_LLM_BASE_URL (and ASR/TTS if used)
 set -a && . ./.env && set +a               # the SDK reads os.environ; it never loads .env itself
 
-uv run --with wheels/ameba_ai_sdk-0.3.0-py3-none-any.whl \
+uv run --with wheels/ameba_ai_sdk-0.4.0-py3-none-any.whl \
   --with fastapi --with "uvicorn[standard]" --with python-multipart \
   uvicorn main:app --host 0.0.0.0 --port 8000
 ```

@@ -63,14 +63,22 @@ async def speech_translate(
     target: str = Form("zh-TW"),
     speak: bool = Form(True),
 ):
+    # Translation is a PRODUCT feature, not an SDK primitive — the app owns
+    # the recipe: ASR -> a translation prompt against the LLM -> optional TTS.
     ai: AmebaAI = app.state.ai
     audio = await file.read()
     try:
-        result = ai.pipelines.speech_translate(audio, target=target, synthesize=speak)
+        source_text = ai.asr.transcribe(audio).text
+        translated = str(ai.llm.chat(
+            f"Translate the following text into {target}. "
+            f"Reply with the translation only, no explanations.\n\n{source_text}",
+            temperature=0,
+        ))
+        audio_out = ai.tts.speak(translated) if speak else None
     except AmebaError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     return {
-        "source_text": result.source_text,
-        "translated": result.translated_text,
-        "audio_mp3_b64": base64.b64encode(result.audio).decode() if result.audio else None,
+        "source_text": source_text,
+        "translated": translated,
+        "audio_mp3_b64": base64.b64encode(audio_out).decode() if audio_out else None,
     }
