@@ -1,0 +1,5 @@
+# ameba-ai-sdk is not on PyPI — install the wheel first (see wheels/README.md):
+#   pip install wheels/ameba_ai_sdk-*.whl
+fastapi
+uvicorn
+python-multipart
